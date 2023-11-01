@@ -2,16 +2,16 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
+interface ParaWithTagPluginSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: ParaWithTagPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class ParaWithTagPlugin extends Plugin {
+	settings: ParaWithTagPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -108,9 +108,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: ParaWithTagPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: ParaWithTagPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
