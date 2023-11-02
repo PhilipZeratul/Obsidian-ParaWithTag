@@ -1,3 +1,11 @@
+# PARA With Tags
+
+## Rider Configuration
+- Compile
+  - Shell Script -> npm run dev
+- Copy File
+  - Shell Script -> CopyFile.ps1 -> -destination_folder "path_to_obsidian_plugins"
+
 # Obsidian Sample Plugin
 
 This is a sample plugin for Obsidian (https://obsidian.md).

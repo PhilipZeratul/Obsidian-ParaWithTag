@@ -1,14 +1,14 @@
 import {
-	App, 
+	App,
 	Editor,
 	MarkdownView,
-	Modal, 
-	Notice, 
-	Plugin, 
-	PluginSettingTab, 
+	Modal,
+	Notice,
+	Plugin,
+	PluginSettingTab,
 	Setting,
 	ItemView,
-	WorkspaceLeaf
+	WorkspaceLeaf, IconName
 } from 'obsidian';
 
 export const PARA_WITH_TAGS_VIEW_TYPE = "para_with_tag_view";
@@ -34,6 +34,10 @@ export class ParaWithTagsView extends ItemView {
 		return "PARA With Tags";
 	}
 	
+	getIcon(): IconName {
+		return "layout-list";
+	}
+
 	async onOpen() {
 		const container = this.containerEl.children[1];
 		container.empty();
@@ -58,12 +62,7 @@ export default class ParaWithTagsPlugin extends Plugin {
 			(leaf) => new ParaWithTagsView(leaf)
 		);
 
-		if (this.app.workspace.layoutReady) {
-			this.initView();
-		} else {
-			this.registerEvent(this.app.workspace.on('layout-ready', this.initView));
-		}
-		
+		this.app.workspace.onLayoutReady(this.initView);		
 		
 		//----- Sample code. -----
 
@@ -130,7 +129,7 @@ export default class ParaWithTagsPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('unloading plugin')
+		console.log('PARA With Tags: unloading plugin.');
 	}
 
 	async loadSettings() {
