@@ -1,20 +1,71 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+	App, 
+	Editor,
+	MarkdownView,
+	Modal, 
+	Notice, 
+	Plugin, 
+	PluginSettingTab, 
+	Setting,
+	ItemView,
+	WorkspaceLeaf
+} from 'obsidian';
 
-// Remember to rename these classes and interfaces!
+export const PARA_WITH_TAGS_VIEW_TYPE = "para_with_tag_view";
 
-interface ParaWithTagPluginSettings {
+interface ParaWithTagsPluginSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: ParaWithTagPluginSettings = {
+const DEFAULT_SETTINGS: ParaWithTagsPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class ParaWithTagPlugin extends Plugin {
-	settings: ParaWithTagPluginSettings;
+export class ParaWithTagsView extends ItemView {
+	constructor(leaf: WorkspaceLeaf) {
+		super(leaf);
+	}
+	
+	getViewType(): string {
+		return PARA_WITH_TAGS_VIEW_TYPE;
+	}
+
+	getDisplayText(): string {
+		return "PARA With Tags";
+	}
+	
+	async onOpen() {
+		const container = this.containerEl.children[1];
+		container.empty();
+		container.createEl("h4", { text : "Para With Tags View Container." })
+	}
+	
+	async onClose() {
+		
+	}
+}
+
+export default class ParaWithTagsPlugin extends Plugin {
+	settings: ParaWithTagsPluginSettings;
 
 	async onload() {
+		console.log('PARA With Tags: Loading plugin v' + this.manifest.version);
+		
 		await this.loadSettings();
+		
+		this.registerView(
+			PARA_WITH_TAGS_VIEW_TYPE,
+			(leaf) => new ParaWithTagsView(leaf)
+		);
+
+		if (this.app.workspace.layoutReady) {
+			this.initView();
+		} else {
+			this.registerEvent(this.app.workspace.on('layout-ready', this.initView));
+		}
+		
+		
+		//----- Sample code. -----
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -79,7 +130,7 @@ export default class ParaWithTagPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		console.log('unloading plugin')
 	}
 
 	async loadSettings() {
@@ -89,6 +140,23 @@ export default class ParaWithTagPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+	
+	async initView () {
+		let { workspace }  = this.app;
+		
+		let leaf: WorkspaceLeaf | null = null;
+		let leaves = workspace.getLeavesOfType(PARA_WITH_TAGS_VIEW_TYPE);
+
+		if (leaves.length > 0) {
+			// A leaf with our view already exists, use that
+			leaf = leaves[0];
+		} else {
+			// Our view could not be found in the workspace, create a new leaf
+			// in the left sidebar for it
+			let leaf = workspace.getLeftLeaf(false);
+			await leaf.setViewState({ type: PARA_WITH_TAGS_VIEW_TYPE, active: true });
+		}
+	};
 }
 
 class SampleModal extends Modal {
@@ -108,9 +176,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: ParaWithTagPlugin;
+	plugin: ParaWithTagsPlugin;
 
-	constructor(app: App, plugin: ParaWithTagPlugin) {
+	constructor(app: App, plugin: ParaWithTagsPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
