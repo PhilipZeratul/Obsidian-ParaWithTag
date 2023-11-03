@@ -27,11 +27,11 @@ export class ParaWithTagsView extends ItemView {
 	async onOpen() {
 		const container = this.containerEl.children[1];
 		container.empty();
-		container.createEl("h4", { text : "Para With Tags View Container." })
+		container.createEl("h4", {text: "Para With Tags View Container."})
 		this.root = createRoot(container);
 		this.root.render(
 			<StrictMode>
-				<ReactView />
+				<ReactView/>
 			</StrictMode>
 		);
 
@@ -40,7 +40,7 @@ export class ParaWithTagsView extends ItemView {
 	async onClose() {
 		this.root?.unmount();
 	}
-	
+
 	async loadFiles() {
 		const openFile = this.app.workspace.getActiveFile();
 
