@@ -47,6 +47,12 @@ export class ParaWithTagsView extends ItemView {
 	async onClose() {
 		
 	}
+	
+	async loadFiles() {
+		const openFile = this.app.workspace.getActiveFile();
+		
+		
+	}
 }
 
 export default class ParaWithTagsPlugin extends Plugin {
