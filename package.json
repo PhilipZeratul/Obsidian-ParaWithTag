@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-para-with-tags",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "PARA workflow with Obsidian tags.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
