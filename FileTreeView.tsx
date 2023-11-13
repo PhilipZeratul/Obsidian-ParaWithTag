@@ -25,10 +25,12 @@ export class ParaWithTagsView extends ItemView {
 	}
 
 	async onOpen() {
+		const fileNames = this.loadFiles();
+		
 		this.root = createRoot(this.containerEl.children[1]);
 		this.root.render(
 			<StrictMode>
-				<ReactView/>
+				<ReactView fileNames={fileNames}/>
 			</StrictMode>
 		);
 
@@ -38,9 +40,14 @@ export class ParaWithTagsView extends ItemView {
 		this.root?.unmount();
 	}
 
-	async loadFiles() {
+	loadFiles() : string[] {
+		// TODO: Deal with other files like Excalidraw
 		const files = this.app.vault.getMarkdownFiles();
-
-
-	}	
+		let fileNames : string[] = [];
+		for (let i = 0; i < files.length; i++)
+		{
+			fileNames[i] = files[i].name;
+		}
+		return fileNames;
+	}
 }
