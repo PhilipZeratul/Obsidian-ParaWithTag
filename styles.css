@@ -6,3 +6,18 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+/*body {*/
+/*	--text-faint: var(--color-base-50);*/
+/*}*/
+
+/*.tree-item-inner {*/
+/*	overflow: hidden;*/
+/*}*/
+/*.tree-item-inner-text {*/
+/*	overflow: hidden;*/
+/*	text-overflow: ellipsis;*/
+/*}*/
+/*.tree-item-inner-subtext {*/
+/*	color: var(--text-faint);*/
+/*	font-size: 85%;*/
+/*}*/

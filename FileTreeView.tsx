@@ -46,7 +46,7 @@ export class ParaWithTagsView extends ItemView {
 		let fileNames : string[] = [];
 		for (let i = 0; i < files.length; i++)
 		{
-			fileNames[i] = files[i].name;
+			fileNames[i] = files[i].basename;
 		}
 		return fileNames;
 	}

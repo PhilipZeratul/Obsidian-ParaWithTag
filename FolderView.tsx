@@ -1,16 +1,20 @@
-﻿function File({fileName}: { fileName: string }) {
-	return <button className="file">{fileName}</button>;
+﻿import React, {useMemo} from "react";
+
+function File({fileName}: { fileName: string }) {
+	return <div className="tree-item-inner.nav-folder-title-contnet">{fileName}</div>;
 }
 
 export function ReactView({fileNames}: { fileNames: string[] }) {
-	const fileNameButtons = fileNames.map((fileName, index) => {
-			return (
-				<li>
-					<File fileName={fileName}/>
-				</li>
-			)
-		}
-	);
+	const fileNameButtons = useMemo(() =>
+		fileNames.map((fileName, index) => {
+				return (
+					<div>
+						<File fileName={fileName}/>
+					</div>
+				)
+			}
+		), [fileNames]
+	)
 
 	return (
 		<>

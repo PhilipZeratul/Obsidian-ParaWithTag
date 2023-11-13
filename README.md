@@ -1,5 +1,8 @@
 # PARA With Tags
 
+I'm not a professional frontend engineer, I learned typescript and react from ground zero with this project. 
+So there must be many place that the code could be optimized.
+
 ## Rider Configuration
 
 - Compile
