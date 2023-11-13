@@ -1,7 +1,7 @@
 ﻿import React, {useMemo} from "react";
 
-function File({fileName}: { fileName: string }) {
-	return <div className="tree-item-inner.nav-folder-title-contnet">{fileName}</div>;
+function NavFile({fileName}: { fileName: string }) {
+	return <div className="tree-item-inner.nav-folder-title-content">{fileName}</div>;
 }
 
 export function ReactView({fileNames}: { fileNames: string[] }) {
@@ -9,7 +9,7 @@ export function ReactView({fileNames}: { fileNames: string[] }) {
 		fileNames.map((fileName, index) => {
 				return (
 					<div>
-						<File fileName={fileName}/>
+						<NavFile fileName={fileName}/>
 					</div>
 				)
 			}

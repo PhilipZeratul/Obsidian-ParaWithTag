@@ -47,6 +47,8 @@ export class ParaWithTagsView extends ItemView {
 		for (let i = 0; i < files.length; i++)
 		{
 			fileNames[i] = files[i].basename;
+			let cache = this.app.metadataCache.getFileCache(files[i]);
+
 		}
 		return fileNames;
 	}
