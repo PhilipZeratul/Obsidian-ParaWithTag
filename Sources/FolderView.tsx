@@ -13,12 +13,11 @@ function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
 	};
 
 	return (
-		<>
-			<div className={"nav-folder-title"} onClick={handleClick}>{folderTreeData.name}</div>
-			<ul>
-				{showChildren && <TreeView folderTreeDatas={folderTreeData.children}/>}
-			</ul>
-		</>
+		<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}>
+			<div className={"tree-item-inner nav-folder-title-content"} onClick={handleClick}>
+				{folderTreeData.name}
+			</div>
+		</div>
 	)
 }
 
@@ -31,7 +30,7 @@ interface FolderTreeData {
 
 function TreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] | undefined }) {
 	return (
-		<div>
+		<div className={"tree-item nav-folder"}>
 			{folderTreeDatas?.map((node) => (
 				<TreeNode folderTreeData={node} key={node.id}/>
 			))}
@@ -102,7 +101,6 @@ export function FolderView({app}: { app: App }) {
 		}
 	}
 
-
 	const fileNameButtons = useMemo(() =>
 		fileNames.map((fileName, index) => {
 				return (
@@ -122,7 +120,9 @@ export function FolderView({app}: { app: App }) {
 						{folderTreeData.name}
 					</div>
 				</div>
-				<div>
+				<div className={"tree-item-children nav-folder-children"}
+					// style={{width: "305px", height: "0.1px", marginBottom: "0px"}}>
+				>
 					<TreeView folderTreeDatas={folderTreeData.children}/>
 				</div>
 			</div>
