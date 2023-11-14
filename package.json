@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-para-with-tags",
+	"name": "obsidian-para-with-properties",
 	"version": "1.0.0",
-	"description": "PARA workflow with Obsidian tags.",
+	"description": "PARA workflow with Obsidian properties.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

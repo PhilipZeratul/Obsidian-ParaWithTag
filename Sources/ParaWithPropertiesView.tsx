@@ -5,7 +5,7 @@ import {FolderView} from "./FolderView";
 
 export const PARA_WITH_TAGS_VIEW_TYPE = "para_with_tag_view";
 
-export class ParaWithTagsView extends ItemView {
+export class ParaWithPropertiesView extends ItemView {
 	root: Root | null = null;
 
 	constructor(leaf: WorkspaceLeaf) {

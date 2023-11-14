@@ -1,18 +1,18 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from "obsidian";
-import {PARA_WITH_TAGS_VIEW_TYPE, ParaWithTagsView} from "./Sources/ParaWithTagsView";
+import {PARA_WITH_TAGS_VIEW_TYPE, ParaWithPropertiesView} from "./Sources/ParaWithPropertiesView";
 
-interface ParaWithTagsPluginSettings {
+interface ParaWithPropertiesPluginSettings {
 	shouldOpenViewOnStart: boolean;
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: ParaWithTagsPluginSettings = {
+const DEFAULT_SETTINGS: ParaWithPropertiesPluginSettings = {
 	shouldOpenViewOnStart: true,
 	mySetting: "default"
 }
 
-export default class ParaWithTagsPlugin extends Plugin {
-	settings: ParaWithTagsPluginSettings;
+export default class ParaWithPropertiesPlugin extends Plugin {
+	settings: ParaWithPropertiesPluginSettings;
 
 	async onload() {
 		console.log("PARA With Tags: Loading plugin v" + this.manifest.version);
@@ -21,7 +21,7 @@ export default class ParaWithTagsPlugin extends Plugin {
 
 		this.registerView(
 			PARA_WITH_TAGS_VIEW_TYPE,
-			(leaf) => new ParaWithTagsView(leaf)
+			(leaf) => new ParaWithPropertiesView(leaf)
 		);
 
 		this.app.workspace.onLayoutReady(async () => {
@@ -141,9 +141,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: ParaWithTagsPlugin;
+	plugin: ParaWithPropertiesPlugin;
 
-	constructor(app: App, plugin: ParaWithTagsPlugin) {
+	constructor(app: App, plugin: ParaWithPropertiesPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
