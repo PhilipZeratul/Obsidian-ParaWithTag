@@ -1,5 +1,5 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from "obsidian";
-import {PARA_WITH_TAGS_VIEW_TYPE, ParaWithTagsView} from "./FileTreeView";
+import {PARA_WITH_TAGS_VIEW_TYPE, ParaWithTagsView} from "./Sources/ParaWithTagsView";
 
 interface ParaWithTagsPluginSettings {
 	shouldOpenViewOnStart: boolean;

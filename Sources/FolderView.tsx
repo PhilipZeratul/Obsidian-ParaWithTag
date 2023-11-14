@@ -4,7 +4,7 @@ function NavFile({fileName}: { fileName: string }) {
 	return <div className="nav-file-title">{fileName}</div>;
 }
 
-export function ReactView({fileNames}: { fileNames: string[] }) {
+export function FolderView({fileNames}: { fileNames: string[] }) {
 	const fileNameButtons = useMemo(() =>
 		fileNames.map((fileName, index) => {
 				return (
