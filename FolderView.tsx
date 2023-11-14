@@ -8,7 +8,7 @@ export function ReactView({fileNames}: { fileNames: string[] }) {
 	const fileNameButtons = useMemo(() =>
 		fileNames.map((fileName, index) => {
 				return (
-					<div>
+					<div key={index}>
 						<NavFile fileName={fileName}/>
 					</div>
 				)
