@@ -3,7 +3,7 @@ import {createRoot, Root} from "react-dom/client";
 import {StrictMode} from "react";
 import {FolderView} from "./FolderView";
 
-export const PARA_WITH_TAGS_VIEW_TYPE = "para_with_tag_view";
+export const PARA_WITH_TAGS_VIEW_TYPE = "para-with-tag-view";
 
 export class ParaWithPropertiesView extends ItemView {
 	root: Root | null = null;

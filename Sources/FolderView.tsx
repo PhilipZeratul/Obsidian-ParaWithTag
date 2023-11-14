@@ -5,40 +5,48 @@ function NavFile({fileName}: { fileName: string }) {
 	return <div className={"nav-file-title"}>{fileName}</div>;
 }
 
-interface FolderTreeData {
-	id: string;
-	name: string;
-	children?: FolderTreeData[];
-}
-
-function TreeView({folderTreeData}: { folderTreeData: FolderTreeData[] | undefined }) {
-	return (
-		<ul>
-			{folderTreeData?.map((node) => (
-				<TreeNode node={node} key={node.id}/>
-			))}
-		</ul>
-	);
-}
-
-function TreeNode({node}: { node: FolderTreeData }) {
-	const {children, name} = node;
-
+function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
 	const [showChildren, setShowChildren] = useState(true);
 
 	const handleClick = () => {
 		setShowChildren(!showChildren);
 	};
+
 	return (
 		<>
-			<div onClick={handleClick} style={{marginBottom: "10px"}}>
-				<span>{name}</span>
-			</div>
-			<ul style={{paddingLeft: "10px", borderLeft: "1px solid black"}}>
-				{showChildren && <TreeView folderTreeData={children}/>}
+			<div className={"nav-folder-title"} onClick={handleClick}>{folderTreeData.name}</div>
+			<ul>
+				{showChildren && <TreeView folderTreeDatas={folderTreeData.children}/>}
 			</ul>
 		</>
+	)
+}
+
+interface FolderTreeData {
+	id: string;
+	name: string;
+	isFile: boolean;
+	children?: FolderTreeData[];
+}
+
+function TreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] | undefined }) {
+	return (
+		<div>
+			{folderTreeDatas?.map((node) => (
+				<TreeNode folderTreeData={node} key={node.id}/>
+			))}
+		</div>
 	);
+}
+
+function TreeNode({folderTreeData}: { folderTreeData: FolderTreeData }) {
+	const {children, name} = folderTreeData;
+
+	if (folderTreeData.isFile) {
+		return <NavFile fileName={folderTreeData.name}/>
+	} else {
+		return <NavFolder folderTreeData={folderTreeData}/>
+	}
 }
 
 export function FolderView({app}: { app: App }) {
@@ -46,26 +54,31 @@ export function FolderView({app}: { app: App }) {
 
 	let folderTreeData: FolderTreeData = {
 		id: "root",
-		name: app.vault.getName().toUpperCase(),
+		name: app.vault.getName(),
+		isFile: false,
 		children: [
 			{
 				id: "project",
 				name: "Project",
+				isFile: false,
 				children: []
 			},
 			{
 				id: "area",
 				name: "Area",
+				isFile: false,
 				children: []
 			},
 			{
 				id: "resource",
 				name: "Resource",
+				isFile: false,
 				children: []
 			},
 			{
 				id: "archive",
 				name: "Archive",
+				isFile: false,
 				children: []
 			}
 		]
@@ -101,18 +114,17 @@ export function FolderView({app}: { app: App }) {
 		), [fileNames]
 	)
 
-	const data: FolderTreeData[] = [
-		folderTreeData
-	];
-	
 	return (
 		<>
-			<div className={"nav-folder-title"}>Hello, React!</div>
-			<div>
-				{fileNameButtons}
-			</div>
-			<div>
-				<TreeView folderTreeData={data}/>
+			<div className={"tree-item nav-folder mod-root"}>
+				<div className={"tree-item-self nav-folder-title"}>
+					<div className={"tree-item-inner nav-folder-title-content"}>
+						{folderTreeData.name}
+					</div>
+				</div>
+				<div>
+					<TreeView folderTreeDatas={folderTreeData.children}/>
+				</div>
 			</div>
 		</>
 	);
