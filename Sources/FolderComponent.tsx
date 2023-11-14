@@ -1,15 +1,15 @@
 ﻿import React, {useMemo} from "react";
 
-function NavFile({fileName}: { fileName: string }) {
+function NavFileComponent({fileName}: { fileName: string }) {
 	return <div className="nav-file-title">{fileName}</div>;
 }
 
-export function FolderView({fileNames}: { fileNames: string[] }) {
+export function FolderComponent({fileNames}: { fileNames: string[] }) {
 	const fileNameButtons = useMemo(() =>
 		fileNames.map((fileName, index) => {
 				return (
 					<div key={index}>
-						<NavFile fileName={fileName}/>
+						<NavFileComponent fileName={fileName}/>
 					</div>
 				)
 			}

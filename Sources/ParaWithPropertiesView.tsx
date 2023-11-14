@@ -1,7 +1,7 @@
 ﻿import {IconName, ItemView, WorkspaceLeaf} from "obsidian";
 import {createRoot, Root} from "react-dom/client";
 import {StrictMode} from "react";
-import {FolderView} from "./FolderView";
+import {FolderComponent} from "./FolderComponent";
 
 export const PARA_WITH_TAGS_VIEW_TYPE = "para_with_tag_view";
 
@@ -30,7 +30,7 @@ export class ParaWithPropertiesView extends ItemView {
 		this.root = createRoot(this.containerEl.children[1]);
 		this.root.render(
 			<StrictMode>
-				<FolderView fileNames={fileNames}/>
+				<FolderComponent fileNames={fileNames}/>
 			</StrictMode>
 		);
 
