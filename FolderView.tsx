@@ -1,7 +1,7 @@
 ﻿import React, {useMemo} from "react";
 
 function NavFile({fileName}: { fileName: string }) {
-	return <div className="tree-item-inner.nav-folder-title-content">{fileName}</div>;
+	return <div className="nav-file-title">{fileName}</div>;
 }
 
 export function ReactView({fileNames}: { fileNames: string[] }) {
