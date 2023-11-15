@@ -25,7 +25,7 @@ interface FolderTreeData {
 	id: string;
 	name: string;
 	isFile: boolean;
-	children?: FolderTreeData[];
+	children: FolderTreeData[];
 }
 
 function TreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] | undefined }) {
@@ -88,6 +88,7 @@ export function FolderView({app}: { app: App }) {
 	const files = this.app.vault.getMarkdownFiles();
 	let fileNames: string[] = [];
 
+	// TODO: Sort by name
 	for (let i = 0; i < files.length; i++) {
 		let paraProperty: string | null = null;
 
@@ -97,9 +98,37 @@ export function FolderView({app}: { app: App }) {
 			paraProperty = frontMatter["PARA"];
 		}
 		if (paraProperty) {
-
+			// Add folder structure.
+			let folderStructure: string[] = paraProperty.split("/");
+			switch (folderStructure[0]) {
+				case "Project":
+					let currentData = folderTreeData.children[0];
+					for (let i = 1; i < folderStructure.length; i++) {
+						let data = currentData.children.find(x => x.name == folderStructure[i]);
+						if (!data) {
+							data = {
+								id: currentData.children.length.toString(),
+								name: folderStructure[i],
+								isFile: false,
+								children: []
+							}
+							currentData.children.push(data);
+						}
+						currentData = data;
+					}
+					break;
+				case "Area":
+					break;
+				case "Resource":
+					break;
+				case "Archive":
+					break;
+					
+			}
 		}
 	}
+	
+	console.log(folderTreeData);
 
 	const fileNameButtons = useMemo(() =>
 		fileNames.map((fileName, index) => {
