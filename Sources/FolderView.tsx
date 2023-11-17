@@ -143,7 +143,8 @@ export function FolderView({app}: { app: App }) {
 					break;
 				case "Archive":
 					break;
-
+				default:
+					break;
 			}
 		}
 
