@@ -1,8 +1,21 @@
 ﻿import React, {useMemo, useState} from "react";
 import {App} from "obsidian";
 
-function NavFile({fileName}: { fileName: string }) {
-	return <div className={"nav-file-title"}>{fileName}</div>;
+interface FolderTreeData {
+	id: string;
+	name: string;
+	isFile: boolean;
+	children: FolderTreeData[];
+}
+
+function NavFile({folderTreeData}: { folderTreeData: FolderTreeData }) {
+	return (
+		<>
+			<div className={"tree-item-self is-clickable nav-file-title"}>
+				<div className={"tree-item-inner nav-file-title-content"}>{folderTreeData.name}</div>
+			</div>
+		</>
+	) 
 }
 
 function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
@@ -11,46 +24,43 @@ function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
 	const handleClick = () => {
 		setShowChildren(!showChildren);
 	};
-
+	
 	return (
-		<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}>
-			<div className={"tree-item-inner nav-folder-title-content"} onClick={handleClick}>
-				{folderTreeData.name}
+		<>
+			<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}
+				 onClick={handleClick}>
+				<div className={"tree-item-inner nav-folder-title-content"}>
+					{folderTreeData.name}
+				</div>
 			</div>
-		</div>
+			<div className={"tree-item-children nav-folder-children"}>
+				{showChildren && <NavTreeView folderTreeDatas={folderTreeData.children}/>}
+			</div>
+		</>
 	)
 }
 
-interface FolderTreeData {
-	id: string;
-	name: string;
-	isFile: boolean;
-	children: FolderTreeData[];
-}
-
-function TreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] | undefined }) {
+function NavTreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] }) {
+	const folders = folderTreeDatas.filter(x => !x.isFile);
+	const files = folderTreeDatas.filter(x => x.isFile);
+	
 	return (
-		<div className={"tree-item nav-folder"}>
-			{folderTreeDatas?.map((node) => (
-				<TreeNode folderTreeData={node} key={node.id}/>
-			))}
-		</div>
+		<>
+			<div className={"tree-item nav-folder"}>
+				{folders.map((node) => (
+					<NavFolder folderTreeData={node}/>
+				))}
+			</div>
+			<div className={"tree-item nav-file"}>
+				{files.map((node) => (
+					<NavFile folderTreeData={node}/>
+				))}
+			</div>
+		</>
 	);
 }
 
-function TreeNode({folderTreeData}: { folderTreeData: FolderTreeData }) {
-	const {children, name} = folderTreeData;
-
-	if (folderTreeData.isFile) {
-		return <NavFile fileName={folderTreeData.name}/>
-	} else {
-		return <NavFolder folderTreeData={folderTreeData}/>
-	}
-}
-
 export function FolderView({app}: { app: App }) {
-
-
 	let folderTreeData: FolderTreeData = {
 		id: "root",
 		name: app.vault.getName(),
@@ -123,23 +133,12 @@ export function FolderView({app}: { app: App }) {
 					break;
 				case "Archive":
 					break;
-					
+
 			}
 		}
 	}
-	
-	console.log(folderTreeData);
 
-	const fileNameButtons = useMemo(() =>
-		fileNames.map((fileName, index) => {
-				return (
-					<div key={index}>
-						<NavFile fileName={fileName}/>
-					</div>
-				)
-			}
-		), [fileNames]
-	)
+	console.log(folderTreeData);
 
 	return (
 		<>
@@ -152,7 +151,7 @@ export function FolderView({app}: { app: App }) {
 				<div className={"tree-item-children nav-folder-children"}
 					// style={{width: "305px", height: "0.1px", marginBottom: "0px"}}>
 				>
-					<TreeView folderTreeDatas={folderTreeData.children}/>
+					<NavTreeView folderTreeDatas={folderTreeData.children}/>
 				</div>
 			</div>
 		</>
