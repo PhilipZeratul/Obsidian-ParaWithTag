@@ -29,6 +29,9 @@ function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
 		<>
 			<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}
 				 onClick={handleClick}>
+				<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator"}>
+					<svg xmlns={"http://www.w3.org/2000/svg"} width={24} height={24} viewBox={"0 0 24 24"} fill={"none"} stroke={"currentColor"} strokeWidth={2} strokeLinecap={"round"} strokeLinejoin={"round"} className={"svg-icon right-triangle"}></svg>
+				</div>
 				<div className={"tree-item-inner nav-folder-title-content"}>
 					{folderTreeData.name}
 				</div>
@@ -48,12 +51,12 @@ function NavTreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] }) {
 		<>
 			<div className={"tree-item nav-folder"}>
 				{folders.map((node) => (
-					<NavFolder folderTreeData={node}/>
+					<NavFolder folderTreeData={node} key={node.id}/>
 				))}
 			</div>
 			<div className={"tree-item nav-file"}>
 				{files.map((node) => (
-					<NavFile folderTreeData={node}/>
+					<NavFile folderTreeData={node} key={node.id}/>
 				))}
 			</div>
 		</>
@@ -89,6 +92,12 @@ export function FolderView({app}: { app: App }) {
 				name: "Archive",
 				isFile: false,
 				children: []
+			},
+			{
+				id: "not para",
+				name: "Not PARA",
+				isFile: false,
+				children: []
 			}
 		]
 	}
@@ -96,13 +105,13 @@ export function FolderView({app}: { app: App }) {
 	// Populate folderTree.
 	// TODO: Deal with other files like Excalidraw
 	const files = this.app.vault.getMarkdownFiles();
-	let fileNames: string[] = [];
 
 	// TODO: Sort by name
 	for (let i = 0; i < files.length; i++) {
 		let paraProperty: string | null = null;
+		let currentData = folderTreeData.children[4];
 
-		fileNames[i] = files[i].basename;
+		// TODO: Use app.FileManager.processfrontmatter()
 		let frontMatter = this.app.metadataCache.getFileCache(files[i])?.frontmatter;
 		if (frontMatter) {
 			paraProperty = frontMatter["PARA"];
@@ -110,21 +119,22 @@ export function FolderView({app}: { app: App }) {
 		if (paraProperty) {
 			// Add folder structure.
 			let folderStructure: string[] = paraProperty.split("/");
+			
 			switch (folderStructure[0]) {
 				case "Project":
-					let currentData = folderTreeData.children[0];
-					for (let i = 1; i < folderStructure.length; i++) {
-						let data = currentData.children.find(x => x.name == folderStructure[i]);
-						if (!data) {
-							data = {
+					currentData = folderTreeData.children[0];
+					for (let j = 1; j < folderStructure.length; j++) {
+						let folderData = currentData.children.find(x => x.name == folderStructure[j]);
+						if (!folderData) {
+							folderData = {
 								id: currentData.children.length.toString(),
-								name: folderStructure[i],
+								name: folderStructure[j],
 								isFile: false,
 								children: []
 							}
-							currentData.children.push(data);
+							currentData.children.push(folderData);
 						}
-						currentData = data;
+						currentData = folderData;
 					}
 					break;
 				case "Area":
@@ -136,6 +146,14 @@ export function FolderView({app}: { app: App }) {
 
 			}
 		}
+
+		let fileData: FolderTreeData= {
+			id: currentData.children.length.toString(),
+			name: files[i].basename,
+			isFile: true,
+			children: []
+		}
+		currentData.children.push(fileData);
 	}
 
 	console.log(folderTreeData);
