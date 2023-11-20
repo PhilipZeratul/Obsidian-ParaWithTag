@@ -104,6 +104,7 @@ export function FolderView({app}: { app: App }) {
 
 	console.log(folderTreeData);
 
+	// TODO: <div style is not correct, need to re-design NavTree.
 	return (
 		<>
 			<div className={"tree-item nav-folder mod-root"}>
@@ -112,9 +113,8 @@ export function FolderView({app}: { app: App }) {
 						{folderTreeData.name}
 					</div>
 				</div>
-				<div className={"tree-item-children nav-folder-children"}
-					// style={{width: "305px", height: "0.1px", marginBottom: "0px"}}>
-				>
+				<div className={"tree-item-children nav-folder-children"}>
+					<div style={{width: "305px", height: "0.1px", marginBottom: "0px"}} />
 					<NavTree folderTreeDatas={folderTreeData.children}/>
 				</div>
 			</div>
