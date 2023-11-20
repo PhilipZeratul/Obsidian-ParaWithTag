@@ -1,6 +1,5 @@
 ﻿import React, {useMemo, useState} from "react";
 import {App} from "obsidian";
-import { BurgerRotate } from "react-icons-animated";
 
 interface FolderTreeData {
 	id: string;
@@ -149,13 +148,15 @@ function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
 	const handleClick = () => {
 		setShowChildren(!showChildren);
 	};
-
+	
 	return (
 		<>
 			<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}
 				 onClick={handleClick}>
-				<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator"}>
-					<svg xmlns={"http://www.w3.org/2000/svg"} width={24} height={24} viewBox={"0 0 24 24"} fill={"none"} stroke={"currentColor"} strokeWidth={2} strokeLinecap={"round"} strokeLinejoin={"round"} className={"svg-icon right-triangle"}></svg>
+				<div className= {showChildren? "tree-item-icon collapse-icon nav-folder-collapse-indicator" : "tree-item-icon collapse-icon nav-folder-collapse-indicator is-collapsed"}>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="svg-icon right-triangle">
+						<path d="M3 8L12 17L21 8"></path>
+					</svg>
 				</div>
 				<div className={"tree-item-inner nav-folder-title-content"}>
 					{folderTreeData.name}
