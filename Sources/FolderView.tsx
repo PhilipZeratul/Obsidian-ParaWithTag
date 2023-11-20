@@ -1,66 +1,12 @@
 ﻿import React, {useMemo, useState} from "react";
 import {App} from "obsidian";
+import { BurgerRotate } from "react-icons-animated";
 
 interface FolderTreeData {
 	id: string;
 	name: string;
 	isFile: boolean;
 	children: FolderTreeData[];
-}
-
-function NavFile({folderTreeData}: { folderTreeData: FolderTreeData }) {
-	return (
-		<>
-			<div className={"tree-item-self is-clickable nav-file-title"}>
-				<div className={"tree-item-inner nav-file-title-content"}>{folderTreeData.name}</div>
-			</div>
-		</>
-	) 
-}
-
-function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
-	const [showChildren, setShowChildren] = useState(true);
-
-	const handleClick = () => {
-		setShowChildren(!showChildren);
-	};
-	
-	return (
-		<>
-			<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}
-				 onClick={handleClick}>
-				<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator"}>
-					<svg xmlns={"http://www.w3.org/2000/svg"} width={24} height={24} viewBox={"0 0 24 24"} fill={"none"} stroke={"currentColor"} strokeWidth={2} strokeLinecap={"round"} strokeLinejoin={"round"} className={"svg-icon right-triangle"}></svg>
-				</div>
-				<div className={"tree-item-inner nav-folder-title-content"}>
-					{folderTreeData.name}
-				</div>
-			</div>
-			<div className={"tree-item-children nav-folder-children"}>
-				{showChildren && <NavTreeView folderTreeDatas={folderTreeData.children}/>}
-			</div>
-		</>
-	)
-}
-
-function NavTreeView({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] }) {
-	const folders = folderTreeDatas.filter(x => !x.isFile);
-	const files = folderTreeDatas.filter(x => x.isFile);
-	
-	return (
-		<>
-			<div className={"tree-item nav-folder"}>
-				{folders.map((node) => (
-					<NavFolder folderTreeData={node} key={node.id}/>
-				))}
-			</div>
-			<div className={"tree-item nav-file"}>
-				{files.map((node) => (
-					<NavFile folderTreeData={node} key={node.id}/>
-				))}
-			</div>
-		</>
-	);
 }
 
 export function FolderView({app}: { app: App }) {
@@ -170,9 +116,64 @@ export function FolderView({app}: { app: App }) {
 				<div className={"tree-item-children nav-folder-children"}
 					// style={{width: "305px", height: "0.1px", marginBottom: "0px"}}>
 				>
-					<NavTreeView folderTreeDatas={folderTreeData.children}/>
+					<NavTree folderTreeDatas={folderTreeData.children}/>
 				</div>
 			</div>
 		</>
 	);
+}
+
+function NavTree({folderTreeDatas}: { folderTreeDatas: FolderTreeData[] }) {
+	const folders = folderTreeDatas.filter(x => !x.isFile);
+	const files = folderTreeDatas.filter(x => x.isFile);
+
+	return (
+		<>
+			<div className={"tree-item nav-folder"}>
+				{folders.map((node) => (
+					<NavFolder folderTreeData={node} key={node.id}/>
+				))}
+			</div>
+			<div className={"tree-item nav-file"}>
+				{files.map((node) => (
+					<NavFile folderTreeData={node} key={node.id}/>
+				))}
+			</div>
+		</>
+	);
+}
+
+function NavFolder({folderTreeData}: { folderTreeData: FolderTreeData }) {
+	const [showChildren, setShowChildren] = useState(true);
+
+	const handleClick = () => {
+		setShowChildren(!showChildren);
+	};
+
+	return (
+		<>
+			<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={"true"}
+				 onClick={handleClick}>
+				<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator"}>
+					<svg xmlns={"http://www.w3.org/2000/svg"} width={24} height={24} viewBox={"0 0 24 24"} fill={"none"} stroke={"currentColor"} strokeWidth={2} strokeLinecap={"round"} strokeLinejoin={"round"} className={"svg-icon right-triangle"}></svg>
+				</div>
+				<div className={"tree-item-inner nav-folder-title-content"}>
+					{folderTreeData.name}
+				</div>
+			</div>
+			<div className={"tree-item-children nav-folder-children"}>
+				{showChildren && <NavTree folderTreeDatas={folderTreeData.children}/>}
+			</div>
+		</>
+	)
+}
+
+function NavFile({folderTreeData}: { folderTreeData: FolderTreeData }) {
+	return (
+		<>
+			<div className={"tree-item-self is-clickable nav-file-title"}>
+				<div className={"tree-item-inner nav-file-title-content"}>{folderTreeData.name}</div>
+			</div>
+		</>
+	)
 }
