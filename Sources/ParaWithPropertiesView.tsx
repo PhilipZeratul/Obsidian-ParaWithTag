@@ -17,7 +17,7 @@ export class ParaWithPropertiesView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return "PARA With Tags";
+		return "PARA With Properties";
 	}
 
 	getIcon(): IconName {

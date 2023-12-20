@@ -1,5 +1,7 @@
-﻿import React, {useMemo, useState} from "react";
+﻿import React, {useMemo, useState, useRef, useEffect} from "react";
 import {App} from "obsidian";
+import {useSpring, animated, a} from "@react-spring/web";
+import useMeasure from 'react-use-measure'
 
 interface NavTreeData {
 	id: string;
@@ -103,8 +105,7 @@ export function FolderView({app}: { app: App }) {
 	}
 
 	console.log(folderTreeData);
-
-	// TODO: <div style is not correct, need to re-design NavTree.
+	
 	return (
 		<>
 			<div className={"tree-item nav-folder mod-root"}>
@@ -113,19 +114,40 @@ export function FolderView({app}: { app: App }) {
 						{folderTreeData.name}
 					</div>
 				</div>
-				<NavTree navTreeDatas={folderTreeData.children}/>
+				<NavTree navTreeDatas={folderTreeData.children} isOpen={true}/>
 			</div>
 		</>
 	);
 }
 
-function NavTree({navTreeDatas}: { navTreeDatas: NavTreeData[] }) {
+function usePrevious<T>(value: T) {
+	const ref = useRef<T>()
+	useEffect(() => void (ref.current = value), [value])
+	return ref.current
+}
+
+function NavTree({navTreeDatas, isOpen}: { navTreeDatas: NavTreeData[], isOpen: boolean }) {
 	const folderDatas = navTreeDatas.filter(x => !x.isFile);
 	const fileDatas = navTreeDatas.filter(x => x.isFile);
 
+	// TODO: Add transition animation
+	const previous = usePrevious(isOpen)
+	const [ref, { height: viewHeight }] = useMeasure()
+	const { height, opacity, y } = useSpring({
+		from: { height: 0, opacity: 0, y: 0 },
+		to: {
+			height: isOpen ? viewHeight : 0,
+			opacity: isOpen ? 1 : 0,
+			y: isOpen ? 0 : 20,
+		},
+	})
+	
 	return (
 		<>
-			<div className={"tree-item-children nav-folder-children"}>
+			<animated.div className={"tree-item-children nav-folder-children"} style={{
+				opacity,
+				height: isOpen  ? 100 : 50,
+			}}>
 				<div style={{height: "0.1px", marginBottom: "0px"}} />
 				{folderDatas.map((node) => (
 					<NavFolder folderData={node} key={node.id}/>
@@ -133,7 +155,8 @@ function NavTree({navTreeDatas}: { navTreeDatas: NavTreeData[] }) {
 				{fileDatas.map((node) => (
 					<NavFile fileData={node} key={node.id}/>
 				))}
-			</div>
+				<div ref={ref} />
+			</animated.div>
 		</>
 	);
 }
@@ -147,21 +170,19 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 	
 	return (
 		<>
-			<div style={{ animationDuration: "var(--anim-duration-fast)" }}>
-				<div className={showChildren? "tree-item nav-folder" : "tree-item nav-folder is-collapsed"}>
-					<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={true}
-						 onClick={handleClick}>
-						<div className= {showChildren? "tree-item-icon collapse-icon nav-folder-collapse-indicator" : "tree-item-icon collapse-icon nav-folder-collapse-indicator is-collapsed"}>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="svg-icon right-triangle">
-								<path d="M3 8L12 17L21 8"></path>
-							</svg>
-						</div>
-						<div className={"tree-item-inner nav-folder-title-content"}>
-							{folderData.name}
-						</div>
+			<div className={showChildren? "tree-item nav-folder" : "tree-item nav-folder is-collapsed"}>
+				<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={true}
+					 onClick={handleClick}>
+					<div className= {showChildren? "tree-item-icon collapse-icon nav-folder-collapse-indicator" : "tree-item-icon collapse-icon nav-folder-collapse-indicator is-collapsed"}>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="svg-icon right-triangle">
+							<path d="M3 8L12 17L21 8"></path>
+						</svg>
 					</div>
-					{showChildren && <NavTree navTreeDatas={folderData.children}/>}
+					<div className={"tree-item-inner nav-folder-title-content"}>
+						{folderData.name}
+					</div>
 				</div>
+				{showChildren && <NavTree navTreeDatas={folderData.children} isOpen={showChildren}/>}
 			</div>
 		</>
 	)

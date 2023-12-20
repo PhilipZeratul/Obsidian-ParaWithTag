@@ -15,7 +15,7 @@ export default class ParaWithPropertiesPlugin extends Plugin {
 	settings: ParaWithPropertiesPluginSettings;
 
 	async onload() {
-		console.log("PARA With Tags: Loading plugin v" + this.manifest.version);
+		console.log("PARA With Properties: Loading plugin v" + this.manifest.version);
 
 		await this.loadSettings();
 
@@ -95,7 +95,7 @@ export default class ParaWithPropertiesPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log("PARA With Tags: unloading plugin.");
+		console.log("PARA With Properties: unloading plugin.");
 	}
 
 	async loadSettings() {
