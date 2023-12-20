@@ -152,13 +152,15 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 		// }, 2000);
 	};
 
-	// TODO: Add transition animation
 	const [ref, {height: viewHeight}] = useMeasure()
 	const {height} = useSpring({
 		from: {height: 0},
 		to: {
 			height: isOpen ? viewHeight : 0
 		},
+		config: {
+			duration: 100
+		}
 	})
 
 	return (
@@ -181,8 +183,7 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 				<animated.div style={{
 					height: isOpen ? 'auto' : height, overflow: 'hidden',
 				}} ref={ref}>
-					{<NavTree navTreeDatas={folderData.children}/>}
-
+					{isOpen && <NavTree navTreeDatas={folderData.children}/>}
 				</animated.div>
 			</div>
 		</>
