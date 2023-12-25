@@ -1,5 +1,5 @@
-﻿import React, {useMemo, useState, useRef, useEffect} from "react";
-import {App} from "obsidian";
+﻿import {App, TFile} from "obsidian";
+import React, {useMemo, useState, useRef, useEffect} from "react";
 import {useSpring, animated, a} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
 
@@ -8,6 +8,7 @@ interface NavTreeData {
 	name: string;
 	isFile: boolean;
 	children: NavTreeData[];
+	file?: TFile;
 }
 
 export function FolderView({app}: { app: App }) {
@@ -98,7 +99,8 @@ export function FolderView({app}: { app: App }) {
 			id: currentData.children.length.toString(),
 			name: files[i].basename,
 			isFile: true,
-			children: []
+			children: [],
+			file: files[i]
 		}
 		currentData.children.push(fileData);
 	}
@@ -111,7 +113,7 @@ export function FolderView({app}: { app: App }) {
 						{navTreeData.name}
 					</div>
 				</div>
-				<NavTree navTreeDatas={navTreeData.children}/>
+				<NavTree navTreeDatas={navTreeData.children} app={app}/>
 			</div>
 		</>
 	);
@@ -123,7 +125,7 @@ function usePrevious<T>(value: T) {
 	return ref.current
 }
 
-function NavTree({navTreeDatas}: { navTreeDatas: NavTreeData[] }) {
+function NavTree({navTreeDatas, app}: { navTreeDatas: NavTreeData[], app: App }) {
 	const folderDatas = navTreeDatas.filter(x => !x.isFile);
 	const fileDatas = navTreeDatas.filter(x => x.isFile);
 
@@ -132,19 +134,18 @@ function NavTree({navTreeDatas}: { navTreeDatas: NavTreeData[] }) {
 			<div className={"tree-item-children nav-folder-children"}>
 				<div style={{height: "0.1px", marginBottom: "0px"}}/>
 				{folderDatas.map((node) => (
-					<NavFolder folderData={node} key={node.id}/>
+					<NavFolder folderData={node} key={node.id} app={app}/>
 				))}
 				{fileDatas.map((node) => (
-					<NavFile fileData={node} key={node.id}/>
+					<NavFile fileData={node} key={node.id} app={app}/>
 				))}
 			</div>
 		</>
 	);
 }
 
-function NavFolder({folderData}: { folderData: NavTreeData }) {
+function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 	const [isOpen, setIsOpen] = useState(true);
-	const previous = usePrevious(isOpen)
 	const [ref, {height: viewHeight}] = useMeasure()
 	const {height} = useSpring({
 		from: {height: 0},
@@ -182,7 +183,7 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 					height: height, overflow: 'hidden',
 				}} >
 					<div ref={ref}>
-					{isOpen && <NavTree navTreeDatas={folderData.children}/>}
+					{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
 					</div>
 				</animated.div>
 			</div>
@@ -190,11 +191,25 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 	)
 }
 
-function NavFile({fileData}: { fileData: NavTreeData }) {
+function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
+	
+	const openFile = (fileData: NavTreeData, e: React.MouseEvent) => {
+		if (fileData.file !== undefined) {
+			let file = fileData.file as TFile;
+			let newLeaf = (e.ctrlKey || e.metaKey) && !(e.shiftKey || e.altKey);
+			let leafBySplit = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
+			
+			let leaf = app.workspace.getLeaf(newLeaf);
+			if (leafBySplit) leaf = app.workspace.createLeafBySplit(leaf, 'vertical');
+			app.workspace.setActiveLeaf(leaf);
+			leaf.openFile(file, { eState: { focus: true } });
+		}
+	};
+	
 	return (
 		<>
 			<div className={"tree-item nav-file"}>
-				<div className={"tree-item-self is-clickable nav-file-title"} draggable={true}>
+				<div className={"tree-item-self is-clickable nav-file-title"} draggable={true} onClick={(e) => openFile(fileData, e)}>
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
