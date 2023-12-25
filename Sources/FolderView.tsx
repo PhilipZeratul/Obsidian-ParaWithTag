@@ -144,14 +144,7 @@ function NavTree({navTreeDatas}: { navTreeDatas: NavTreeData[] }) {
 
 function NavFolder({folderData}: { folderData: NavTreeData }) {
 	const [isOpen, setIsOpen] = useState(true);
-
-	const handleClick = () => {
-		setIsOpen(!isOpen);
-		// setTimeout(() => {
-		// 	setUnmountChildren(!unmountChildren);
-		// }, 2000);
-	};
-
+	const previous = usePrevious(isOpen)
 	const [ref, {height: viewHeight}] = useMeasure()
 	const {height} = useSpring({
 		from: {height: 0},
@@ -162,6 +155,11 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 			duration: 100
 		}
 	})
+
+	const handleClick = () => {
+		setIsOpen(!isOpen);
+		console.log(viewHeight)
+	};
 
 	return (
 		<>
@@ -181,9 +179,11 @@ function NavFolder({folderData}: { folderData: NavTreeData }) {
 					</div>
 				</div>
 				<animated.div style={{
-					height: isOpen ? 'auto' : height, overflow: 'hidden',
-				}} ref={ref}>
+					height: height, overflow: 'hidden',
+				}} >
+					<div ref={ref}>
 					{isOpen && <NavTree navTreeDatas={folderData.children}/>}
+					</div>
 				</animated.div>
 			</div>
 		</>
