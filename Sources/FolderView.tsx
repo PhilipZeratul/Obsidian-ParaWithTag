@@ -192,7 +192,6 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 }
 
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
-	
 	const openFile = (fileData: NavTreeData, e: React.MouseEvent) => {
 		if (fileData.file !== undefined) {
 			let file = fileData.file as TFile;

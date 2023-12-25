@@ -5,7 +5,6 @@ So there must be many place that the code could be optimized.
 
 ## TODO
 
-- [ ] Open file when clicked
 - [ ] Drag and drop
 - [ ] Handle go back
 - [ ] Ctrl/Shift/Alt Click to expand all leaves (Configurable in settings)
