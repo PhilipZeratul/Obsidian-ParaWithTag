@@ -1,8 +1,7 @@
 ﻿import {App, TFile} from "obsidian";
-import React, {useState, useCallback} from "react";
-import {useSpring, animated, a} from "@react-spring/web";
+import React, {useState} from "react";
+import {useSpring, animated} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
-import {useDropzone} from 'react-dropzone';
 import { useRecoilState } from 'recoil';
 import * as RecoilState from 'Sources/Recoil/RecoilState'; 
 
@@ -157,19 +156,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 	const handleClick = () => {
 		setIsOpen(!isOpen);
 	};
-
-	const dropAccepted = (files: File[]) => {
-		console.log("OnDrop");
-		console.log(files[0].name);
-		// files.map(async (file) => {
-		// 	file.arrayBuffer().then((arrayBuffer) => {
-		// 		//plugin.app.vault.adapter.writeBinary(activeFolderPath + '/' + file.name, arrayBuffer);
-		// 	});
-		// });
-	};
 	
-	const {getRootProps, getInputProps, acceptedFiles, isDragActive} = useDropzone({onDropAccepted: dropAccepted, noClick: true} );
-
 	return (
 		<>
 			<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed")}>
@@ -183,13 +170,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 							<path d="M3 8L12 17L21 8"></path>
 						</svg>
 					</div>
-					<div className={"tree-item-inner nav-folder-title-content"} {...getRootProps()}>
-						<input {...getInputProps()} />
-						{
-							isDragActive ?
-								<p>Drop the files here ...</p> :
-								<p>Drag 'n' drop some files here, or click to select files</p>
-						}
+					<div className={"tree-item-inner nav-folder-title-content"}>
 						{folderData.name}
 					</div>
 				</div>
