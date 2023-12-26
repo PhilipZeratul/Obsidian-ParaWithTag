@@ -141,23 +141,31 @@ function NavTree({navTreeDatas, app}: { navTreeDatas: NavTreeData[], app: App })
 	);
 }
 
+// TODO: Default drag and drop doesnt work anymore.
+const DragAndDropTypes = {
+	File: "File",
+	Folder: "Folder"
+}
+
 function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 	const [isOpen, setIsOpen] = useState(true);
-	const [ref, {height: viewHeight}] = useMeasure()
+	const [refMeasureHeight, {height: measureHeight}] = useMeasure()
 	const {height} = useSpring({
 		from: {height: 0},
 		to: {
-			height: isOpen ? viewHeight : 0
+			height: isOpen ? measureHeight : 0
 		},
 		config: {
 			duration: 100
 		}
 	})
 
-	const [, drop] = useDrop(
+	const [, refDrop] = useDrop(
 		() => ({
-			accept: "File",
-			drop: () => {console.log("Dropped")}
+			accept: DragAndDropTypes.File,
+			drop: () => {
+				console.log("Dropped")
+			}
 		}), []
 	)
 
@@ -168,8 +176,8 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 	return (
 		<>
 			<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed")}>
-				<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={true}
-					 onClick={handleClick}>
+				<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"}
+					 onClick={handleClick} ref={refDrop}>
 					<div
 						className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" + (isOpen ? "" : " is-collapsed")}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -178,14 +186,12 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 							<path d="M3 8L12 17L21 8"></path>
 						</svg>
 					</div>
-					<div className={"tree-item-inner nav-folder-title-content"} ref={drop}>
+					<div className={"tree-item-inner nav-folder-title-content"}>
 						{folderData.name}
 					</div>
 				</div>
-				<animated.div style={{
-					height: height, overflow: 'hidden',
-				}}>
-					<div ref={ref}>
+				<animated.div style={{height: height, overflow: 'hidden'}}>
+					<div ref={refMeasureHeight}>
 						{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
 					</div>
 				</animated.div>
@@ -197,8 +203,9 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 	const [activeFile, setActiveFile] = useRecoilState(RecoilState.activeFile);
 
-	const [{isDragging}, drag] = useDrag(() => ({
-		type: "File",
+	const [{isDragging}, refDrag] = useDrag(() => ({
+		type: DragAndDropTypes.File,
+		item: fileData,
 		collect: monitor => ({
 			isDragging: monitor.isDragging(),
 		}),
@@ -224,7 +231,7 @@ function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 			<div className={"tree-item nav-file"}>
 				<div
 					className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active" : "")}
-					onClick={(e) => openFile(e)} ref={drag}>
+					onClick={(e) => openFile(e)} ref={refDrag}>
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
