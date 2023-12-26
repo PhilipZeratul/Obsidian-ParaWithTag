@@ -9,6 +9,9 @@ So there must be many place that the code could be optimized.
 - [ ] Handle go back
 - [ ] Ctrl/Shift/Alt Click to expand all leaves (Configurable in settings)
 - [ ] Multi-select support
+- [ ] Mobile touch support
+  - the touch backend for react dnd
+  - https://react-dnd.github.io/react-dnd/about
 
 ## Rider Configuration
 
