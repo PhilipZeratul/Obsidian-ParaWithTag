@@ -2,8 +2,9 @@
 import React, {useState} from "react";
 import {useSpring, animated} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
-import { useRecoilState } from 'recoil';
-import * as RecoilState from 'Sources/Recoil/RecoilState'; 
+import {useRecoilState} from 'recoil';
+import * as RecoilState from 'Sources/Recoil/RecoilState';
+import {useDrag, useDrop} from 'react-dnd'
 
 interface NavTreeData {
 	id: string;
@@ -140,7 +141,7 @@ function NavTree({navTreeDatas, app}: { navTreeDatas: NavTreeData[], app: App })
 	);
 }
 
-function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
+function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 	const [isOpen, setIsOpen] = useState(true);
 	const [ref, {height: viewHeight}] = useMeasure()
 	const {height} = useSpring({
@@ -152,11 +153,18 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 			duration: 100
 		}
 	})
-	
+
+	const [, drop] = useDrop(
+		() => ({
+			accept: "File",
+			drop: () => {console.log("Dropped")}
+		}), []
+	)
+
 	const handleClick = () => {
 		setIsOpen(!isOpen);
 	};
-	
+
 	return (
 		<>
 			<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed")}>
@@ -170,7 +178,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 							<path d="M3 8L12 17L21 8"></path>
 						</svg>
 					</div>
-					<div className={"tree-item-inner nav-folder-title-content"}>
+					<div className={"tree-item-inner nav-folder-title-content"} ref={drop}>
 						{folderData.name}
 					</div>
 				</div>
@@ -178,7 +186,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 					height: height, overflow: 'hidden',
 				}}>
 					<div ref={ref}>
-					{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
+						{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
 					</div>
 				</animated.div>
 			</div>
@@ -189,26 +197,34 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 	const [activeFile, setActiveFile] = useRecoilState(RecoilState.activeFile);
 
+	const [{isDragging}, drag] = useDrag(() => ({
+		type: "File",
+		collect: monitor => ({
+			isDragging: monitor.isDragging(),
+		}),
+	}))
+
 	let file = fileData.file as TFile;
-	
+
 	// TODO: Multi-select support. Shift click & Alt click.
 	const openFile = (e: React.MouseEvent) => {
 		if (file !== undefined) {
 			let newLeaf = (e.ctrlKey || e.metaKey) && !(e.shiftKey || e.altKey);
 			let leafBySplit = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
-			
+
 			let leaf = app.workspace.getLeaf(newLeaf);
 			if (leafBySplit) leaf = app.workspace.createLeafBySplit(leaf, "vertical");
 			app.workspace.setActiveLeaf(leaf);
 			leaf.openFile(file, {eState: {focus: true}}).then(r => setActiveFile(file));
 		}
 	};
-	
+
 	return (
 		<>
 			<div className={"tree-item nav-file"}>
-				<div className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active": "")} 
-					 draggable={true} onClick={(e) => openFile(e)}>
+				<div
+					className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active" : "")}
+					onClick={(e) => openFile(e)} ref={drag}>
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
