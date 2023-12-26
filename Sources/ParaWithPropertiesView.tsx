@@ -2,6 +2,7 @@
 import {createRoot, Root} from "react-dom/client";
 import {StrictMode} from "react";
 import {FolderView} from "./FolderView";
+import {RecoilRoot} from 'recoil';
 
 export const PARA_WITH_TAGS_VIEW_TYPE = "para-with-tag-view";
 
@@ -27,9 +28,11 @@ export class ParaWithPropertiesView extends ItemView {
 	async onOpen() {
 		this.root = createRoot(this.containerEl.children[1]);
 		this.root.render(
-			<StrictMode>
-				<FolderView app={this.app}/>
-			</StrictMode>
+			<RecoilRoot>
+				<StrictMode>
+					<FolderView app={this.app}/>
+				</StrictMode>
+			</RecoilRoot>
 		);
 	}
 

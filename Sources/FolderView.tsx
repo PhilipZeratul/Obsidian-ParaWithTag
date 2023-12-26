@@ -2,6 +2,9 @@
 import React, {useMemo, useState, useRef, useEffect} from "react";
 import {useSpring, animated, a} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
+import {useDropzone} from 'react-dropzone';
+import { useRecoilState } from 'recoil';
+import * as RecoilState from 'Sources/Recoil/RecoilState'; 
 
 interface NavTreeData {
 	id: string;
@@ -192,23 +195,29 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 }
 
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
+	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+	const [activeFile, setActiveFile] = useRecoilState(RecoilState.activeFile);
+
+	let file = fileData.file as TFile;
+	
+	// TODO: Multi-select support. Shift click & Alt click.
 	const openFile = (fileData: NavTreeData, e: React.MouseEvent) => {
-		if (fileData.file !== undefined) {
-			let file = fileData.file as TFile;
+		if (file !== undefined) {
 			let newLeaf = (e.ctrlKey || e.metaKey) && !(e.shiftKey || e.altKey);
 			let leafBySplit = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
 			
 			let leaf = app.workspace.getLeaf(newLeaf);
 			if (leafBySplit) leaf = app.workspace.createLeafBySplit(leaf, 'vertical');
 			app.workspace.setActiveLeaf(leaf);
-			leaf.openFile(file, { eState: { focus: true } });
+			leaf.openFile(file, {eState: {focus: true}}).then(r => setActiveFile(file));
 		}
 	};
 	
 	return (
 		<>
 			<div className={"tree-item nav-file"}>
-				<div className={"tree-item-self is-clickable nav-file-title"} draggable={true} onClick={(e) => openFile(fileData, e)}>
+				<div className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? ' is-active': '')} 
+					 draggable={true} onClick={(e) => openFile(fileData, e)}>
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
