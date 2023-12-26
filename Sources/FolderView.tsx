@@ -1,5 +1,5 @@
 ﻿import {App, TFile} from "obsidian";
-import React, {useMemo, useState, useRef, useEffect} from "react";
+import React, {useState, useCallback} from "react";
 import {useSpring, animated, a} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
 import {useDropzone} from 'react-dropzone';
@@ -122,12 +122,6 @@ export function FolderView({app}: { app: App }) {
 	);
 }
 
-function usePrevious<T>(value: T) {
-	const ref = useRef<T>()
-	useEffect(() => void (ref.current = value), [value])
-	return ref.current
-}
-
 function NavTree({navTreeDatas, app}: { navTreeDatas: NavTreeData[], app: App }) {
 	const folderDatas = navTreeDatas.filter(x => !x.isFile);
 	const fileDatas = navTreeDatas.filter(x => x.isFile);
@@ -159,32 +153,49 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 			duration: 100
 		}
 	})
-
+	
 	const handleClick = () => {
 		setIsOpen(!isOpen);
-		console.log(viewHeight)
 	};
+
+	const dropAccepted = (files: File[]) => {
+		console.log("OnDrop");
+		console.log(files[0].name);
+		// files.map(async (file) => {
+		// 	file.arrayBuffer().then((arrayBuffer) => {
+		// 		//plugin.app.vault.adapter.writeBinary(activeFolderPath + '/' + file.name, arrayBuffer);
+		// 	});
+		// });
+	};
+	
+	const {getRootProps, getInputProps, acceptedFiles, isDragActive} = useDropzone({onDropAccepted: dropAccepted, noClick: true} );
 
 	return (
 		<>
-			<div className={isOpen ? "tree-item nav-folder" : "tree-item nav-folder is-collapsed"}>
+			<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed")}>
 				<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"} draggable={true}
 					 onClick={handleClick}>
 					<div
-						className={isOpen ? "tree-item-icon collapse-icon nav-folder-collapse-indicator" : "tree-item-icon collapse-icon nav-folder-collapse-indicator is-collapsed"}>
+						className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" + (isOpen ? "" : " is-collapsed")}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 							 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
 							 className="svg-icon right-triangle">
 							<path d="M3 8L12 17L21 8"></path>
 						</svg>
 					</div>
-					<div className={"tree-item-inner nav-folder-title-content"}>
+					<div className={"tree-item-inner nav-folder-title-content"} {...getRootProps()}>
+						<input {...getInputProps()} />
+						{
+							isDragActive ?
+								<p>Drop the files here ...</p> :
+								<p>Drag 'n' drop some files here, or click to select files</p>
+						}
 						{folderData.name}
 					</div>
 				</div>
 				<animated.div style={{
 					height: height, overflow: 'hidden',
-				}} >
+				}}>
 					<div ref={ref}>
 					{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
 					</div>
@@ -195,19 +206,18 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app:App }) {
 }
 
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
-	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
 	const [activeFile, setActiveFile] = useRecoilState(RecoilState.activeFile);
 
 	let file = fileData.file as TFile;
 	
 	// TODO: Multi-select support. Shift click & Alt click.
-	const openFile = (fileData: NavTreeData, e: React.MouseEvent) => {
+	const openFile = (e: React.MouseEvent) => {
 		if (file !== undefined) {
 			let newLeaf = (e.ctrlKey || e.metaKey) && !(e.shiftKey || e.altKey);
 			let leafBySplit = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
 			
 			let leaf = app.workspace.getLeaf(newLeaf);
-			if (leafBySplit) leaf = app.workspace.createLeafBySplit(leaf, 'vertical');
+			if (leafBySplit) leaf = app.workspace.createLeafBySplit(leaf, "vertical");
 			app.workspace.setActiveLeaf(leaf);
 			leaf.openFile(file, {eState: {focus: true}}).then(r => setActiveFile(file));
 		}
@@ -216,8 +226,8 @@ function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 	return (
 		<>
 			<div className={"tree-item nav-file"}>
-				<div className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? ' is-active': '')} 
-					 draggable={true} onClick={(e) => openFile(fileData, e)}>
+				<div className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active": "")} 
+					 draggable={true} onClick={(e) => openFile(e)}>
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
