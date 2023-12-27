@@ -4,7 +4,6 @@ import {useSpring, animated} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
 import {useRecoilState} from 'recoil';
 import * as RecoilState from 'Sources/Recoil/RecoilState';
-import {useDrag, useDrop} from 'react-dnd'
 
 interface NavTreeData {
 	id: string;
@@ -159,15 +158,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 			duration: 100
 		}
 	})
-
-	const [, refDrop] = useDrop(
-		() => ({
-			accept: DragAndDropTypes.File,
-			drop: () => {
-				console.log("Dropped")
-			}
-		}), []
-	)
+	
 
 	const handleClick = () => {
 		setIsOpen(!isOpen);
@@ -177,7 +168,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 		<>
 			<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed")}>
 				<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"}
-					 onClick={handleClick} ref={refDrop}>
+					 onClick={handleClick}>
 					<div
 						className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" + (isOpen ? "" : " is-collapsed")}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -202,14 +193,7 @@ function NavFolder({folderData, app}: { folderData: NavTreeData, app: App }) {
 
 function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 	const [activeFile, setActiveFile] = useRecoilState(RecoilState.activeFile);
-
-	const [{isDragging}, refDrag] = useDrag(() => ({
-		type: DragAndDropTypes.File,
-		item: fileData,
-		collect: monitor => ({
-			isDragging: monitor.isDragging(),
-		}),
-	}))
+	
 
 	let file = fileData.file as TFile;
 
@@ -231,7 +215,7 @@ function NavFile({fileData, app}: { fileData: NavTreeData, app: App }) {
 			<div className={"tree-item nav-file"}>
 				<div
 					className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active" : "")}
-					onClick={(e) => openFile(e)} ref={refDrag}>
+					onClick={(e) => openFile(e)} >
 					<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
 				</div>
 			</div>
