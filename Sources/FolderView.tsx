@@ -185,9 +185,11 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 			{(provided, snapshot) => (
 				<div className={"tree-item nav-folder" +
 					(isOpen ? "" : " is-collapsed") +
-					(snapshot.isDraggingOver ? " is-being-dragged-over" : "")} >
+					(snapshot.isDraggingOver ? " is-being-dragged-over" : "")}>
 					<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"}
-						 onClick={handleClick}>
+						 onClick={handleClick}
+						 ref={provided.innerRef}
+						 {...provided.droppableProps}>
 						<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" +
 							(isOpen ? "" : " is-collapsed")}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -197,9 +199,7 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 								<path d="M3 8L12 17L21 8"></path>
 							</svg>
 						</div>
-						<div className={"tree-item-inner nav-folder-title-content"}
-							 ref={provided.innerRef}
-							 {...provided.droppableProps}>
+						<div className={"tree-item-inner nav-folder-title-content"}>
 							{folderData.name}
 						</div>
 					</div>
