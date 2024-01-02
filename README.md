@@ -6,9 +6,11 @@ So there must be many place that the code could be optimized.
 ## TODO
 
 - [ ] Drag and drop
+  - Multi drag is too hard, postpone it
 - [ ] Handle go back
 - [ ] Ctrl/Shift/Alt Click to expand all leaves (Configurable in settings)
 - [ ] Multi-select support
+  - Shift/Alt click~~~~
 
 ## Rider Configuration
 
