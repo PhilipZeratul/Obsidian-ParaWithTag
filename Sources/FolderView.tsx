@@ -109,49 +109,40 @@ export function FolderView({app}: { app: App }) {
 	}
 
 	function findChildById(data: NavTreeData, id: string): NavTreeData | undefined {
-		// Check the current item's ID
 		if (data.id === id) {
 			return data;
 		}
-
-		// Recursively search within children
 		for (const child of data.children) {
 			const foundChild = findChildById(child, id);
 			if (foundChild) {
 				return foundChild;
 			}
 		}
-
-		// If not found, return undefined
 		return undefined;
 	}
-	
-	function onDragStart (start: DragStart, provided: ResponderProvided) {
-		let dragData = findChildById(navTreeData, start.draggableId);
-		console.log("onDragStart: id = " + start.draggableId + " name = " + dragData?.name);
-	}
-	
+
 	function onDragEnd(result: DropResult, provided: ResponderProvided) {
 		// dropped outside the list
 		if (!result.destination) {
 			return;
 		}
 
+		let dragData = findChildById(navTreeData, result.draggableId);
 		let dropData = findChildById(navTreeData, result.destination.droppableId);
-		console.log("onDragEnd: id = " + result.destination.droppableId + " name = " + dropData?.name);
+		console.log("onDragEnd: from: " + dragData?.name + " to: " + dropData?.name);
 	}
 
 	return (
-		<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-			<div className={"tree-item nav-folder mod-root"}>
-				<div className={"tree-item-self nav-folder-title"}>
-					<div className={"tree-item-inner nav-folder-title-content"}>
-						{navTreeData.name}
-					</div>
+		<div className={"tree-item nav-folder mod-root"}>
+			<div className={"tree-item-self nav-folder-title"}>
+				<div className={"tree-item-inner nav-folder-title-content"}>
+					{navTreeData.name}
 				</div>
-				<NavTree navTreeDatas={navTreeData.children} app={app}/>
 			</div>
-		</DragDropContext>
+			<DragDropContext onDragEnd={onDragEnd}>
+				<NavTree navTreeDatas={navTreeData.children} app={app}/>
+			</DragDropContext>
+		</div>
 	);
 }
 
@@ -160,17 +151,15 @@ function NavTree({navTreeDatas, app}: { navTreeDatas: NavTreeData[], app: App })
 	const fileDatas = navTreeDatas.filter(x => x.isFile);
 
 	return (
-		<>
-			<div className={"tree-item-children nav-folder-children"}>
-				<div style={{height: "0.1px", marginBottom: "0px"}}/>
-				{folderDatas.map((node, index) => (
-					<NavFolder folderData={node} key={node.id} app={app} index={index}/>
-				))}
-				{fileDatas.map((node, index) => (
-					<NavFile fileData={node} key={node.id} app={app} index={index}/>
-				))}
-			</div>
-		</>
+		<div className={"tree-item-children nav-folder-children"}>
+			<div style={{height: "0.1px", marginBottom: "0px"}}/>
+			{folderDatas.map((node, index) => (
+				<NavFolder folderData={node} key={node.id} app={app} index={index}/>
+			))}
+			{fileDatas.map((node, index) => (
+				<NavFile fileData={node} key={node.id} app={app} index={index}/>
+			))}
+		</div>
 	);
 }
 
@@ -194,15 +183,13 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 	return (
 		<Droppable droppableId={folderData.id}>
 			{(provided, snapshot) => (
-				<div
-					className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed") + (snapshot.isDraggingOver ? " is-being-dragged-over" : "")}
-					ref={provided.innerRef}
-					{...provided.droppableProps}>
-
+				<div className={"tree-item nav-folder" +
+					(isOpen ? "" : " is-collapsed") +
+					(snapshot.isDraggingOver ? " is-being-dragged-over" : "")} >
 					<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"}
 						 onClick={handleClick}>
-						<div
-							className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" + (isOpen ? "" : " is-collapsed")}>
+						<div className={"tree-item-icon collapse-icon nav-folder-collapse-indicator" +
+							(isOpen ? "" : " is-collapsed")}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 								 fill="none"
 								 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -210,12 +197,13 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 								<path d="M3 8L12 17L21 8"></path>
 							</svg>
 						</div>
-						<div className={"tree-item-inner nav-folder-title-content"}>
+						<div className={"tree-item-inner nav-folder-title-content"}
+							 ref={provided.innerRef}
+							 {...provided.droppableProps}>
 							{folderData.name}
 						</div>
-
 					</div>
-					<animated.div style={{height: height, overflow: 'hidden'}}>
+					<animated.div style={{height: height, overflow: snapshot.isDraggingOver ? "visible" : "hidden"}}>
 						<div ref={measureRef}>
 							{isOpen && <NavTree navTreeDatas={folderData.children} app={app}/>}
 						</div>
@@ -248,14 +236,15 @@ function NavFile({fileData, app, index}: { fileData: NavTreeData, app: App, inde
 	return (
 		<Draggable draggableId={fileData.id} index={index} key={useId()}>
 			{(provided, snapshot) => (
-				<div className={"tree-item nav-file"}
-					 ref={provided.innerRef}
+				<div ref={provided.innerRef}
 					 {...provided.draggableProps}
 					 {...provided.dragHandleProps}>
-					<div
-						className={"tree-item-self is-clickable nav-file-title" + (activeFile === file ? " is-active" : "")}
-						onClick={(e) => openFile(e)}>
-						<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
+					<div className={"tree-item nav-file"}>
+						<div className={"tree-item-self is-clickable nav-file-title" +
+							(activeFile === file ? " is-active" : "")}
+							 onClick={(e) => openFile(e)}>
+							<div className={"tree-item-inner nav-file-title-content"}>{fileData.name}</div>
+						</div>
 					</div>
 				</div>
 			)}
