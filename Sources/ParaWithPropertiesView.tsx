@@ -3,7 +3,6 @@ import {createRoot, Root} from "react-dom/client";
 import {StrictMode} from "react";
 import {FolderView} from "./FolderView";
 import {RecoilRoot} from 'recoil';
-import {DragDropContext} from '@hello-pangea/dnd';
 
 export const PARA_WITH_TAGS_VIEW_TYPE = "para-with-tag-view";
 
@@ -27,18 +26,11 @@ export class ParaWithPropertiesView extends ItemView {
 	}
 
 	async onOpen() {
-		function onDragEnd() {
-			// the only one that is required
-			console.log("onDragEnd");
-		}
-		
 		this.root = createRoot(this.containerEl.children[1]);
 		this.root.render(
 			<StrictMode>
 				<RecoilRoot>
-					<DragDropContext onDragEnd={onDragEnd}>
-						<FolderView app={this.app}/>
-					</DragDropContext>
+					<FolderView app={this.app}/>
 				</RecoilRoot>
 			</StrictMode>
 		);

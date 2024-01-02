@@ -4,7 +4,7 @@ import {useSpring, animated} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
 import {useRecoilState} from 'recoil';
 import * as RecoilState from 'Sources/Recoil/RecoilState';
-import {Draggable, Droppable} from '@hello-pangea/dnd';
+import {DragDropContext, Draggable, DragStart, Droppable, DropResult, ResponderProvided} from '@hello-pangea/dnd';
 
 interface NavTreeData {
 	id: string;
@@ -14,38 +14,38 @@ interface NavTreeData {
 	file?: TFile;
 }
 
-export function FolderView({app}: { app: App }) {	
+export function FolderView({app}: { app: App }) {
 	let navTreeData: NavTreeData = {
-		id: "root",
+		id: useId(),
 		name: app.vault.getName(),
 		isFile: false,
 		children: [
 			{
-				id: "project",
+				id: useId(),
 				name: "Project",
 				isFile: false,
 				children: []
 			},
 			{
-				id: "area",
+				id: useId(),
 				name: "Area",
 				isFile: false,
 				children: []
 			},
 			{
-				id: "resource",
+				id: useId(),
 				name: "Resource",
 				isFile: false,
 				children: []
 			},
 			{
-				id: "archive",
+				id: useId(),
 				name: "Archive",
 				isFile: false,
 				children: []
 			},
 			{
-				id: "not para",
+				id: useId(),
 				name: "Not PARA",
 				isFile: false,
 				children: []
@@ -77,7 +77,7 @@ export function FolderView({app}: { app: App }) {
 						let folderData = currentData.children.find(x => x.name == folderStructure[j]);
 						if (!folderData) {
 							folderData = {
-								id: currentData.children.length.toString(),
+								id: useId(),
 								name: folderStructure[j],
 								isFile: false,
 								children: []
@@ -99,7 +99,7 @@ export function FolderView({app}: { app: App }) {
 		}
 
 		let fileData: NavTreeData = {
-			id: currentData.children.length.toString(),
+			id: useId(),
 			name: files[i].basename,
 			isFile: true,
 			children: [],
@@ -108,8 +108,41 @@ export function FolderView({app}: { app: App }) {
 		currentData.children.push(fileData);
 	}
 
+	function findChildById(data: NavTreeData, id: string): NavTreeData | undefined {
+		// Check the current item's ID
+		if (data.id === id) {
+			return data;
+		}
+
+		// Recursively search within children
+		for (const child of data.children) {
+			const foundChild = findChildById(child, id);
+			if (foundChild) {
+				return foundChild;
+			}
+		}
+
+		// If not found, return undefined
+		return undefined;
+	}
+	
+	function onDragStart (start: DragStart, provided: ResponderProvided) {
+		let dragData = findChildById(navTreeData, start.draggableId);
+		console.log("onDragStart: id = " + start.draggableId + " name = " + dragData?.name);
+	}
+	
+	function onDragEnd(result: DropResult, provided: ResponderProvided) {
+		// dropped outside the list
+		if (!result.destination) {
+			return;
+		}
+
+		let dropData = findChildById(navTreeData, result.destination.droppableId);
+		console.log("onDragEnd: id = " + result.destination.droppableId + " name = " + dropData?.name);
+	}
+
 	return (
-		<>
+		<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
 			<div className={"tree-item nav-folder mod-root"}>
 				<div className={"tree-item-self nav-folder-title"}>
 					<div className={"tree-item-inner nav-folder-title-content"}>
@@ -118,7 +151,7 @@ export function FolderView({app}: { app: App }) {
 				</div>
 				<NavTree navTreeDatas={navTreeData.children} app={app}/>
 			</div>
-		</>
+		</DragDropContext>
 	);
 }
 
@@ -159,11 +192,13 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 	};
 
 	return (
-		<Droppable droppableId={useId()}>
+		<Droppable droppableId={folderData.id}>
 			{(provided, snapshot) => (
-				<div className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed") + (snapshot.isDraggingOver ? " is-being-dragged-over" : "")}
-					 ref={provided.innerRef}
-					 {...provided.droppableProps}>
+				<div
+					className={"tree-item nav-folder" + (isOpen ? "" : " is-collapsed") + (snapshot.isDraggingOver ? " is-being-dragged-over" : "")}
+					ref={provided.innerRef}
+					{...provided.droppableProps}>
+
 					<div className={"tree-item-self is-clickable mod-collapsible nav-folder-title"}
 						 onClick={handleClick}>
 						<div
@@ -178,6 +213,7 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 						<div className={"tree-item-inner nav-folder-title-content"}>
 							{folderData.name}
 						</div>
+
 					</div>
 					<animated.div style={{height: height, overflow: 'hidden'}}>
 						<div ref={measureRef}>
@@ -209,9 +245,8 @@ function NavFile({fileData, app, index}: { fileData: NavTreeData, app: App, inde
 		}
 	};
 
-	console.log("Draggable id = " + useId() + " index = " + index);
 	return (
-		<Draggable draggableId={useId()} index={index}>
+		<Draggable draggableId={fileData.id} index={index} key={useId()}>
 			{(provided, snapshot) => (
 				<div className={"tree-item nav-file"}
 					 ref={provided.innerRef}
