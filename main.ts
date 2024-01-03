@@ -1,5 +1,5 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from "obsidian";
-import {PARA_WITH_TAGS_VIEW_TYPE, ParaWithPropertiesView} from "./Sources/ParaWithPropertiesView";
+import {PARA_WITH_PROPERTIES_TYPE, ParaWithPropertiesView} from "./Sources/ParaWithPropertiesView";
 
 interface ParaWithPropertiesPluginSettings {
 	shouldOpenViewOnStart: boolean;
@@ -20,7 +20,7 @@ export default class ParaWithPropertiesPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.registerView(
-			PARA_WITH_TAGS_VIEW_TYPE,
+			PARA_WITH_PROPERTIES_TYPE,
 			(leaf) => new ParaWithPropertiesView(leaf)
 		);
 
@@ -110,7 +110,7 @@ export default class ParaWithPropertiesPlugin extends Plugin {
 		let {workspace} = this.app;
 
 		let leaf: WorkspaceLeaf | null = null;
-		let leaves = workspace.getLeavesOfType(PARA_WITH_TAGS_VIEW_TYPE);
+		let leaves = workspace.getLeavesOfType(PARA_WITH_PROPERTIES_TYPE);
 
 		if (leaves.length > 0) {
 			// A leaf with our view already exists, use that
@@ -119,7 +119,7 @@ export default class ParaWithPropertiesPlugin extends Plugin {
 			// Our view could not be found in the workspace, create a new leaf
 			// in the left sidebar for it
 			let leaf = workspace.getLeftLeaf(false);
-			await leaf.setViewState({type: PARA_WITH_TAGS_VIEW_TYPE, active: true});
+			await leaf.setViewState({type: PARA_WITH_PROPERTIES_TYPE, active: true});
 		}
 	};
 }
