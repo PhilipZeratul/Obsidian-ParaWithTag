@@ -4,110 +4,10 @@ import {useSpring, animated} from "@react-spring/web";
 import useMeasure from 'react-use-measure'
 import {useRecoilState} from 'recoil';
 import * as RecoilState from 'Sources/Recoil/RecoilState';
-import {DragDropContext, Draggable, DragStart, Droppable, DropResult, ResponderProvided} from '@hello-pangea/dnd';
+import {DragDropContext, Draggable, Droppable, DropResult} from '@hello-pangea/dnd';
+import {NavTreeData} from "./NavTreeData";
 
-interface NavTreeData {
-	id: string;
-	name: string;
-	isFile: boolean;
-	children: NavTreeData[];
-	file?: TFile;
-}
-
-export function FolderView({app}: { app: App }) {
-	let navTreeData: NavTreeData = {
-		id: useId(),
-		name: app.vault.getName(),
-		isFile: false,
-		children: [
-			{
-				id: useId(),
-				name: "Project",
-				isFile: false,
-				children: []
-			},
-			{
-				id: useId(),
-				name: "Area",
-				isFile: false,
-				children: []
-			},
-			{
-				id: useId(),
-				name: "Resource",
-				isFile: false,
-				children: []
-			},
-			{
-				id: useId(),
-				name: "Archive",
-				isFile: false,
-				children: []
-			},
-			{
-				id: useId(),
-				name: "Not PARA",
-				isFile: false,
-				children: []
-			}
-		]
-	}
-
-	// Populate folderTree.
-	// TODO: Deal with other files like Excalidraw
-	const files = this.app.vault.getMarkdownFiles();
-
-	// TODO: Sort by name
-	for (let i = 0; i < files.length; i++) {
-		let paraProperty: string | null = null;
-		let currentData = navTreeData.children[4]; // Default to Not PARA.
-		// TODO: Use app.FileManager.processfrontmatter()
-		let frontMatter = this.app.metadataCache.getFileCache(files[i])?.frontmatter;
-		if (frontMatter) {
-			paraProperty = frontMatter["PARA"];
-		}
-		if (paraProperty) {
-			// Add folder structure.
-			let folderStructure: string[] = paraProperty.split("/");
-
-			switch (folderStructure[0]) {
-				case "Project":
-					currentData = navTreeData.children[0];
-					for (let j = 1; j < folderStructure.length; j++) {
-						let folderData = currentData.children.find(x => x.name == folderStructure[j]);
-						if (!folderData) {
-							folderData = {
-								id: useId(),
-								name: folderStructure[j],
-								isFile: false,
-								children: []
-							}
-							currentData.children.push(folderData);
-						}
-						currentData = folderData;
-					}
-					break;
-				case "Area":
-					break;
-				case "Resource":
-					break;
-				case "Archive":
-					break;
-				default:
-					break;
-			}
-		}
-
-		let fileData: NavTreeData = {
-			id: useId(),
-			name: files[i].basename,
-			isFile: true,
-			children: [],
-			file: files[i]
-		}
-		currentData.children.push(fileData);
-	}
-
+export function FolderView({navTreeData}: { navTreeData: NavTreeData }) {
 	function findChildById(data: NavTreeData, id: string): NavTreeData | undefined {
 		if (data.id === id) {
 			return data;
@@ -121,7 +21,7 @@ export function FolderView({app}: { app: App }) {
 		return undefined;
 	}
 
-	function onDragEnd(result: DropResult, provided: ResponderProvided) {
+	function onDragEnd(result: DropResult) {
 		// dropped outside the list
 		if (!result.destination) {
 			return;
@@ -175,6 +75,7 @@ function NavFolder({folderData, app, index}: { folderData: NavTreeData, app: App
 			duration: 100
 		}
 	})
+	// TODO: Use previous isOpen state to simplify the animation. 
 
 	const handleClick = () => {
 		setIsOpen(!isOpen);
